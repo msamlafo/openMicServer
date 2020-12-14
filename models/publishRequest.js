@@ -1,0 +1,42 @@
+module.exports = (sequelize, DataTypes) =>{
+    const PublishRequestProcessing = sequelize.define('publishRequest', {
+        requestDate: {
+            type:DataTypes.DATE,
+            allowNull:false
+        },
+        poemId: {
+            type:DataTypes.INTEGER,
+            allowNull:false
+        },
+        hasOriginalContent: {
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        noVulgarLanguage: {
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        noGrammaticalError: {
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        editorName: {
+            type:DataTypes.STRING,
+            allowNull:false
+        },
+        editorComment: {
+            type:DataTypes.STRING,
+            allowNull:true
+        },
+        publicationApproved: {
+            type:DataTypes.BOOLEAN,
+            defaultValue:false,
+            allowNull:false
+        },
+        decisionDate: {
+            type:DataTypes.DATE,
+            allowNull:true
+        }
+    })
+    return PublishRequestProcessing;
+}
