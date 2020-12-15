@@ -1,6 +1,5 @@
 const router = require('express').Router();
-const User = require('../db').import('../models/user');
-const Profile = require('../db').import('../models/profile');
+const {User, Profile} = require('../db');
 const jwt= require('jsonwebtoken');
 const bcrypt= require('bcryptjs');
 const validateSession = require('../middleware/validateSession');
@@ -63,7 +62,7 @@ router.post('/login', (req, res) =>{
 })
 
 //delete user by id
-router.delete('/delete/', validateSession, (req, res) =>{
+router.delete('/delete', validateSession, (req, res) =>{
     const query = { where: { id: req.user.id } };
     User.destroy(query)
     .then(() => res.status(200).json({ message: 'user is removed' }))
@@ -80,7 +79,7 @@ router.get('/', validateSession, (req, res) =>{
     .catch(err => res.status(500).json({ error: err }));
 })
 
-//get all usertes
+//get all user for admin only
 router.get('/all', validateSession, (req, res ) =>{
     if(req.user.isAdmin){
         User.findAll()
@@ -92,5 +91,7 @@ router.get('/all', validateSession, (req, res ) =>{
     }
     
 })
+
+//permit admin to delete user
 
 module.exports= router;

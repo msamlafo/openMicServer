@@ -1,5 +1,5 @@
 module.exports=(sequelize, DataTypes) =>{
-    const Poetry= sequelize.define('poetry', {
+    return sequelize.define('poetry', {
         title: {
             type: DataTypes.STRING
         },
@@ -19,14 +19,16 @@ module.exports=(sequelize, DataTypes) =>{
             type: DataTypes.STRING
         },
         isExternal:{
-            type:DataTypes.BOOLEAN
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
         },
         isPublic:{
-            type:DataTypes.BOOLEAN
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
         },
-        publicationRequested: {
-            type:DataTypes.BOOLEAN
+        isPublicationRequested: {
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
         }
-    })
-    return Poetry;
+    });
 }

@@ -43,4 +43,4 @@ Reply.belongsTo(Comment);
 User.hasMany(Reply);
 Reply.belongsTo(User);
 
-module.exports = database;
+module.exports = {database,User,Comment,Profile,PublishRequest,Reply,Poetry};

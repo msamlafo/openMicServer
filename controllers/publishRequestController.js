@@ -1,5 +1,5 @@
-const validateSession = require("../middleware/validate-session");
-const Request = require('..db/').import('../models/publishRequestProcessing');
+const validateSession = require("../middleware/validateSession");
+const {Request, Poetry, User} = require("../db");
 const router = require('express').Router();
 
 //create request
@@ -41,7 +41,7 @@ router.put('/update/:id', validateSession, (req, res) =>{
         publicationApproved,
         decisionDate: req.body.decisionDate
     }
-    const query = { where: { publishRequestId: req.params.id, userId: req.user.id }}
+    const query = { where: { publishRequestId: req.params.id, userId: req.user.id } }
 
     Poetry.update(updateRequest, query)
     .then((updateRequest) => res.status(200).json(updateRequest))

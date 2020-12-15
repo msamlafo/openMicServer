@@ -1,5 +1,5 @@
-const validateSession = require("../middleware/validate-session");
-const Comment = require('..db/').import('../models/comment');
+const validateSession = require("../middleware/validateSession");
+const {Comment} = require("../db");
 const router = require('express').Router();
 
 //create comment

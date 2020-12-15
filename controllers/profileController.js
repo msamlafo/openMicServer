@@ -1,8 +1,8 @@
-const validateSession = require("../middleware/validateSession");
-var Sequelize = require('sequelize');
-const Profile = require('../db').import('../models/profile');
 const router = require('express').Router();
+var Sequelize = require('sequelize');
 const Op=Sequelize.Op;
+const validateSession = require("../middleware/validateSession");
+const {Profile} = require("../db");
 
 //create user profile
 router.post('/create', validateSession, (req, res) =>{
@@ -30,11 +30,11 @@ router.post('/create', validateSession, (req, res) =>{
 router.get('/mine', validateSession, (req, res) =>{
     let userid = req.user.id;
     Profile.findAll({
-        where: { owner: userid }
+        where: { userId: userid }
     })
     .then(profile => res.status(200).json(profile))
     .catch(err => res.status(500).json({ error: err}))
-})
+});
 
 //get all profiles
 router.get('/all', validateSession, (req, res) =>{
@@ -43,20 +43,22 @@ router.get('/all', validateSession, (req, res) =>{
         .then(profile => res.status(200).json(profile))
         .catch(err => res.status(500).json({ error: err }))
     }
-})
+});
 
 //get one user
-router.get('/', validateSession, (req, res) =>{
-        Profile.findAll({
-            where: {id: req.user.id}
-        })
-        .then(profile => res.status(200).json(profile))
-        .catch(err => res.status(500).json({ error: err }))
-})
+// router.get('/', validateSession, (req, res) =>{
+//         Profile.findAll({
+//             where: {userId: req.user.id}
+//         })
+//         .then(profile => res.status(200).json(profile))
+//         .catch(err => res.status(500).json({ error: err }))
+// });
 
 //get individual profile for update
-router.put('/update/:id', validateSession, (req, res) =>{
-    const existingProfile = Profile.findOne({ where : {"userId": req.user.id}});
+router.put('/update', validateSession, (req, res) =>{
+    const existingProfile = Profile.findOne({ 
+        where: { userId: req.user.id }
+    });
     if (existingProfile){
         const updateProfile = {
             firstName: req.body.firstName,
@@ -72,7 +74,6 @@ router.put('/update/:id', validateSession, (req, res) =>{
         };
         const query = { 
             where: {
-                id: req.params.id,
                 userId: req.user.id
             }
         }
@@ -86,7 +87,7 @@ router.put('/update/:id', validateSession, (req, res) =>{
         //respond with error saying profile already exists
         res.status(404).json({ message: "Profile not found." })
     }
-})
+});
 
 //allow individual profiles to be deleted
 router.delete('/delete', validateSession, (req, res) =>{
@@ -98,5 +99,8 @@ router.delete('/delete', validateSession, (req, res) =>{
     Profile.destroy(query)
     .then(() => res.status(200).json({ message: 'Profile entry removed'}))
     .catch((err) => res.status(200).json({ error: err }));
-})
+});
+
+// permit admin to delete profile
+
 module.exports = router;

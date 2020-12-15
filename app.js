@@ -1,6 +1,6 @@
 require('dotenv').config();
 const Express = require ('express');
-const database = require('./db');
+const {database} = require('./db');
 const controllers = require('./controllers');
 const app = Express();
 
@@ -11,15 +11,15 @@ const app = Express();
 
 database.sync();
 // database.sync({force:true});
-app.use(require('./middleware/headers'))
+app.use(require('./middleware/headers'));
 
 app.use(Express.json());  //brings in JSON parser for backend
 
 app.use('/user', controllers.UserController);
 app.use('/profile', controllers.ProfileController);
-// app.use('/poetry', controllers.PoetryController);
-// app.use('/comment', controllers.CommentController);
-// app.use('/publish', controllers.PublishRequestProcessingController);
+app.use('/poetry', controllers.PoetryController);
+app.use('/comment', controllers.CommentController);
+app.use('/publish', controllers.PublishRequestController);
 
 
 
