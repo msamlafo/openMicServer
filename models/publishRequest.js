@@ -2,11 +2,8 @@ module.exports = (sequelize, DataTypes) =>{
     const PublishRequestProcessing = sequelize.define('publishRequest', {
         requestDate: {
             type:DataTypes.DATE,
-            allowNull:false
-        },
-        poemId: {
-            type:DataTypes.INTEGER,
-            allowNull:false
+            allowNull:false,
+            defaultValue:DataTypes.NOW
         },
         hasOriginalContent: {
             type:DataTypes.BOOLEAN,
@@ -28,7 +25,7 @@ module.exports = (sequelize, DataTypes) =>{
             type:DataTypes.STRING,
             allowNull:true
         },
-        publicationApproved: {
+        isPublicationApproved: {
             type:DataTypes.BOOLEAN,
             defaultValue:false,
             allowNull:false

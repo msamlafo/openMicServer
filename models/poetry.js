@@ -6,9 +6,6 @@ module.exports=(sequelize, DataTypes) =>{
         dateCreated :{
             type: DataTypes.DATE
         },
-        author: {
-            type: DataTypes.STRING
-        },
         category: {
             type: DataTypes.STRING
         },

@@ -3,19 +3,27 @@ const {Comment} = require("../db");
 const router = require('express').Router();
 
 //create comment
+//poemId and userId not working
 router.post('/create', validateSession, (req, res) =>{
     const commentLine = {
-        include : [{
-        userComment: req.body.userComment,
-        poemId: req.body.poem
-        }]
+        comment: req.body.comment,
+        poemId: req.body.poetryId,
+        userId: req.body.userId
     }
     Comment.create(commentLine)
     .then(comment => res.status(200).json(comment))
     .catch(err => res.status(200).json({ error: err }))
 })
 
+//get all comments
+router.get("/", (req,res) => {
+    Comment.findAll()
+    .then(comment => res.status(200).json(comment))
+    .catch(err => res.status(500).json({ error:err }))
+})
+
 // get comment by id
+//testing not successful
 router.get('/:id', validateSession, function(req, res){
     let comment = req.params.id;
     Comment.findAll({
@@ -26,17 +34,14 @@ router.get('/:id', validateSession, function(req, res){
 
 })
 
-//get all comments
-router.get("/all", (req,res) => {
-    Comment.findAll()
-    .then(comment => res.status(200).json(comment))
-    .catch(err => res.status(500).json({ error:err }))
-})
 
 //update individual's comment
-router.put("/update/:id", validateSession, function (req, res){
+//Testing not successful
+router.put("/:id", validateSession, function (req, res){
     const updateComment = {
-        userComment: req.body.userComment
+        comment: req.body.comment,
+        poetryId: req.body.poetryId, 
+        userId: req.body.userId
     }
     const query = { where: { id: req.params.id, userId: req.user.id } }
 
@@ -46,7 +51,8 @@ router.put("/update/:id", validateSession, function (req, res){
 });
 
 //delete individual's conment
-router.delete("/delete/:id", validateSession, function (req, res){
+//Testing not successful
+router.delete("/:id", validateSession, function (req, res){
     const query = {
         where: { id: req.params.id, userId: req.user.id }
     };

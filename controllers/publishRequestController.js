@@ -4,20 +4,28 @@ const router = require('express').Router();
 
 //create request
 router.post('/create', validateSession, (req, res) =>{
-    const requestPublication = {
-        publishRequestId: req.body.publishRequestId,
-        requestDate: req.body.requestDate,
-        poemId: req.body.poemId,
-        hasOriginalContent: req.body.hasOriginalContent,
-        noVulgarLanguage: req.body.noVulgarLanguage,
-        noGrammaticalError: req.body.noVulgarLanguage,
-        editorName: req.body.editorName,
-        editorComment: req.body.editorComment,
-        publicationApproved,
-        decisionDate: req.body.decisionDate
+    //get poem
+    if(poetryId){
+        poetryId=req.body.poetryId;
+        console.log("Poem exists!");
     }
+    //does poem exist
+    //does poem belong to current user
+
+    //is poem public
+    //if poem is already public return poem is already public
+    //if poem is not public has publication been requested?
+    //if it has already been requested res.send(publication already requested)
+
+    const requestPublication = {
+        poetryId: req.body.poetryId
+    };
+    
     Request.create(requestPublication)
-    .then(request => res.status(200).json(request))
+    .then(request => {
+        //if request creation is successful, update isPublicationRequested to true
+        res.status(200).json(request)
+    })
     .catch(err => res.status(200).json({ error: err }));
 })
 
