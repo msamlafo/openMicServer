@@ -5,6 +5,11 @@ module.exports = (sequelize, DataTypes) =>{
             allowNull:false,
             defaultValue:DataTypes.NOW
         },
+        status: {
+            type:DataTypes.STRING,
+            allowNull:false,
+            defaultValue:'pending'
+        },
         hasOriginalContent: {
             type:DataTypes.BOOLEAN,
             defaultValue:false
@@ -19,7 +24,8 @@ module.exports = (sequelize, DataTypes) =>{
         },
         editorName: {
             type:DataTypes.STRING,
-            allowNull:false
+            allowNull:false,
+            defaultValue: '',
         },
         editorComment: {
             type:DataTypes.STRING,

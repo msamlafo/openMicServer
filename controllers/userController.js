@@ -55,7 +55,7 @@ router.post('/login', (req, res) =>{
                 }
             })
         } else {
-            res.status(500).json({error: 'user not found'});
+            res.status(400).json({error: 'Incorrect login credentials'});
         }
     })
     .catch(err=> res.status(500).json({error:err}))

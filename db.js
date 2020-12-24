@@ -1,7 +1,6 @@
 const Sequelize = require('sequelize');
 
 //create a new instance of sequelize, connecting us to the database
-// const database = new Sequelize(process.env.CONNECTION_STRING);
 const database = new Sequelize(process.env.NAME, 'postgres', process.env.PASS, {
     host: 'localhost',
     dialect: 'postgres'
