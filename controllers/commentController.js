@@ -8,7 +8,7 @@ router.post('/create', validateSession, (req, res) =>{
     const commentLine = {
         comment: req.body.comment,
         poemId: req.body.poetryId,
-        userId: req.body.userId
+        userId: req.user.id
     }
     Comment.create(commentLine)
     .then(comment => res.status(200).json(comment))

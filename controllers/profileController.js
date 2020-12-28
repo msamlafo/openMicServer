@@ -29,7 +29,7 @@ router.post('/create', validateSession, (req, res) =>{
 //Get '/' get individual profile by id
 router.get('/mine', validateSession, (req, res) =>{
     let userid = req.user.id;
-    Profile.findAll({
+    Profile.findOne({
         where: { userId: userid }
     })
     .then(profile => res.status(200).json(profile))
@@ -38,10 +38,35 @@ router.get('/mine', validateSession, (req, res) =>{
 
 //get all profiles
 router.get('/all', validateSession, (req, res) =>{
-    if(req.user.isAdmin){
-        Profile.findAll()
-        .then(profile => res.status(200).json(profile))
-        .catch(err => res.status(500).json({ error: err }))
+    try {
+        if(req.user.isAdmin){
+            Profile.findAll()
+            .then(profiles => res.status(200).json({
+                data:profiles,
+                message:'success',
+                status:200
+            })
+            )
+            .catch(err => res.status(500).json({     
+                data:[],
+                message:err.message,
+                status:500 }))
+        } else {
+            console.log("User is not an admin");
+            res.status(401).json({
+                data:[],
+                status:500,
+                message: "Not authorized"
+            });
+        }
+    } catch (error) {
+        // exception handling
+        console.log(error);
+        res.status(500).json({
+            data:[],
+            status:500,
+            message: "An error occured"
+        });
     }
 });
 

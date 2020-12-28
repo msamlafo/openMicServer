@@ -26,7 +26,22 @@ router.post('/create', validateSession, (req, res) =>{
 
 //get all poems
 router.get("/", (req,res) => {
-    Poetry.findAll()
+    Poetry.findAll(
+        {
+            include:[
+                { 
+                    model: User, 
+                    attributes: ['email'],
+                    include:[
+                        {
+                            model: Profile,
+                            attributes: ['firstName','lastName']
+                        }
+                    ]
+                }
+            ], 
+        }
+    )
     .then(poetry => res.status(200).json(poetry))
     .catch(err => res.status(500).json({ error:err }))
 });
@@ -35,7 +50,8 @@ router.get("/", (req,res) => {
 router.get('/mine', validateSession, function(req, res){
     Poetry.findAll({
         where: {
-            userId: req.user.id }
+            userId: req.user.id },
+            
     })
     .then(poetry => res.status(200).json(poetry))
     .catch(err => res.status(500).json({ error: err}))
