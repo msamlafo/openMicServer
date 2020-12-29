@@ -5,60 +5,142 @@ const router = require('express').Router();
 //create comment
 //poemId and userId not working
 router.post('/create', validateSession, (req, res) =>{
-    const commentLine = {
-        comment: req.body.comment,
-        poemId: req.body.poetryId,
-        userId: req.user.id
+    try {
+        const commentLine = {
+            comment: req.body.comment,
+            poemId: req.body.poetryId,
+            userId: req.user.id
+        }
+        Comment.create(commentLine)
+        .then(comment => res.status(200).json({
+            data:comment,
+            status:200,
+            message:'Sucess'
+        }))
+        .catch(err => res.status(200).json({
+            data:[],
+            status:500,
+            message: err.message
+        }))
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            data:[],
+            status:500, 
+            message:'An error occured.'
+        })
     }
-    Comment.create(commentLine)
-    .then(comment => res.status(200).json(comment))
-    .catch(err => res.status(200).json({ error: err }))
 })
 
 //get all comments
 router.get("/", (req,res) => {
-    Comment.findAll()
-    .then(comment => res.status(200).json(comment))
-    .catch(err => res.status(500).json({ error:err }))
+    try {
+        Comment.findAll()
+        .then(comment => res.status(200).json({
+            data:comment,
+            status:200,
+            message:'Sucess'
+        }))
+        .catch(err => res.status(500).json({
+            data:[],
+            status:500,
+            message: err.message
+        }))
+    } catch (error){
+        console.log(error);
+        res.status(500).json({
+            data:[],
+            status:500, 
+            message:'An error occured.'
+        })
+    }
 })
 
 // get comment by id
 //testing not successful
 router.get('/:id', validateSession, function(req, res){
-    let comment = req.params.id;
-    Comment.findAll({
-        where: { comment: comment }
-    })
-    .then(comment => res.status(200).json(comment))
-    .catch(err => res.status(500).json({ error: err}))
-
+    try {
+        let comment = req.params.id;
+        Comment.findAll({
+            where: { comment: comment }
+        })
+        .then(comment => res.status(200).json({
+            data:comment,
+                status:200,
+                message:'Sucess'
+        }))
+        .catch(err => res.status(500).json({
+                data:[],
+                status:500,
+                message: err.message
+        }))
+    } catch (error){
+        console.log(error);
+        res.status(500).json({
+            data:[],
+            status:500, 
+            message:'An error occured.'
+        })
+    }
 })
 
 
 //update individual's comment
 //Testing not successful
 router.put("/:id", validateSession, function (req, res){
-    const updateComment = {
-        comment: req.body.comment,
-        poetryId: req.body.poetryId, 
-        userId: req.body.userId
+    try {
+        const updateComment = {
+            comment: req.body.comment,
+            poetryId: req.body.poetryId, 
+            userId: req.body.userId
+        }
+        const query = { where: { id: req.params.id, userId: req.user.id } }
+    
+        Comment.update(updateComment, query)
+        .then((comment) => res.status(200).json({
+            data:comment,
+            status:200,
+            message:'Sucess'
+        }))
+        .catch((err) => res.status(500).json({
+            data:[],
+            status:500,
+            message: err.message
+        }));
+    } catch(error){
+        console.log(error);
+        res.status(500).json({
+            data:[],
+            status:500, 
+            message:'An error occured.'
+        })
     }
-    const query = { where: { id: req.params.id, userId: req.user.id } }
-
-    Comment.update(updateComment, query)
-    .then((comment) => res.status(200).json(comment))
-    .catch((err) => res.status(500).json({error:err}));
 });
 
 //delete individual's conment
 //Testing not successful
 router.delete("/:id", validateSession, function (req, res){
-    const query = {
-        where: { id: req.params.id, userId: req.user.id }
-    };
-    Comment.destroy(query)
-    .then(() => res.status(200).json({ message: "Comment entry removed"}))
-    .catch((err) => res.status(500).json({ error: err }));
+    try{
+        const query = {
+            where: { id: req.params.id, userId: req.user.id }
+        };
+        Comment.destroy(query)
+        .then(() => res.status(200).json({  
+            status:200,
+            message: "Comment entry removed"}))
+        .catch((err) => res.status(500).json({
+            data:[],
+            status:500,
+            message: err.message
+        }));
+    } catch(error){
+        console.log(error);
+        res.status(200).json({
+            data:[],
+            status:500, 
+            message:'An error occured.'
+        })
+    }
 })
 
 module.exports =router;

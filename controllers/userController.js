@@ -6,88 +6,165 @@ const validateSession = require('../middleware/validateSession');
 
 //POST: '/signup' creates a account
 router.post('/signup', (req, res) =>{
+    try {
+        User.create({
+            password: bcrypt.hashSync(req.body.password, 13),
+            isAdmin: req.body.isAdmin,
+            email: req.body.email
+        })
+        //create Profile
+        .then(user => Profile.create({
+                userId: user.id,
+                firstName: req.body.firstName,
+                lastName: req.body.lastName
+            })
+            .then(() => user)
+            .catch(err => res.status(500).json({
+                data:[],
+                status:500,
+                message:err.message
+            }))
+        )
+        //log in user
+        .then(user =>{
+            const token = jwt.sign({id: user.id},
+            process.env.JWT_SECRET, {expiresIn:"7d"})
+            res.json({
+                user:user,
+                message:"user was created successfully!",
+                sessionToken: token
+            })
+        })
+        .catch(err => res.status(500).json({
+            data:[],
+            status:500,
+            message:err.message
+        }))
+    } catch(error){
+        console.log(error);
+        res.status(500).json({
+            data:[],
+            status:500,
+            message:'An error occured.'
+        })
+    }
     //create user record
-    User.create({
-        password: bcrypt.hashSync(req.body.password, 13),
-        isAdmin: req.body.isAdmin,
-        email: req.body.email
-    })
-    //create Profile
-    .then(user => Profile.create({
-            userId: user.id,
-            firstName: req.body.firstName,
-            lastName: req.body.lastName
-        })
-        .then(() => user)
-        .catch(err => res.status(500).json(err))
-    )
-    //log in user
-    .then(user =>{
-        const token = jwt.sign({id: user.id},
-        process.env.JWT_SECRET, {expiresIn:"7d"})
-        res.json({
-            user:user,
-            message:"user was created successfully!",
-            sessionToken: token
-        })
-    })
-    .catch(err => res.status(500).json(err))
 })
 
 //POST 'login' to login user
 router.post('/login', (req, res) =>{
-    User.findOne({
-        where:{email: req.body.email}
-    })
-    .then(user =>{
-        if(user){
-            bcrypt.compare(req.body.password, user.password, (err, matches) =>{
-                if(matches){
-                    const token= jwt.sign({id: user.id},
-                    process.env.JWT_SECRET, {expiresIn:"7d"})
-                    res.status(200).json({
-                        user:user,
-                        message: "successfully authenticated",
-                        sessionToken:token
-                    })
+    try {
+        User.findOne({
+            where:{email: req.body.email}
+        })
+        .then(user =>{
+            if(user){
+                bcrypt.compare(req.body.password, user.password, (err, matches) =>{
+                    if(matches){
+                        const token= jwt.sign({id: user.id},
+                        process.env.JWT_SECRET, {expiresIn:"7d"})
+                        res.status(200).json({
+                            user:user,
+                            message: "successfully authenticated",
+                            sessionToken:token
+                        })
                     }else {
-                        res.status(502).json({error: 'password missmatch'})
-                }
-            })
-        } else {
-            res.status(400).json({error: 'Incorrect login credentials'});
-        }
-    })
-    .catch(err=> res.status(500).json({error:err}))
+                        res.status(502).json({error: 'password mismatch'})
+                    }
+                })
+            } else {
+                res.status(400).json({error: 'Incorrect login credentials'});
+            }
+        })
+        .catch(err=> res.status(500).json({
+            data:[],
+            status:500,
+            message:err.message
+        }))
+    } catch(error){
+        console.log(error);
+        res.status(500).json({
+            data:[],
+            status:500,
+            message:'An error occured.'
+        })
+    }
 })
 
 //delete user by id
 router.delete('/delete', validateSession, (req, res) =>{
-    const query = { where: { id: req.user.id } };
-    User.destroy(query)
-    .then(() => res.status(200).json({ message: 'user is removed' }))
-    .catch((err) => res.status(200).json({ error: err }));
+    try {
+        const query = { where: { id: req.user.id } };
+        User.destroy(query)
+        .then(() => res.status(200).json({ 
+            status: 200,
+            message: 'User is removed'
+        }))
+        .catch((err) => res.status(200).json({
+            data:[],
+            status:500,
+            message:err.message
+            }));
+    } catch (error){
+        console.log(error);
+        res.status(500).json({
+            data:[],
+            status:500,
+            message:'An error occured.'
+        })
+    }
 })
 
 //get one user
 router.get('/', validateSession, (req, res) =>{
-    //console.log(req);
-    User.findAll({
-        where: { id: req.user.id }
-    })
-    .then((user) => res.status(200).json(user))
-    .catch(err => res.status(500).json({ error: err }));
+    try {
+        User.findAll({
+            where: { id: req.user.id }
+        })
+        .then((user) => res.status(200).json({
+            data:user,
+            status:200,
+            message:'success'}))
+        .catch(err => res.status(500).json({
+                data:[],
+                status:500,
+                message:err.message
+        }));
+    } catch(error){
+        console.log(error);
+        res.status(500).json({
+            data:[],
+            status:500,
+            message:'An error occured.'
+        })
+    }
 })
 
 //get all user for admin only
 router.get('/all', validateSession, (req, res ) =>{
-    if(req.user.isAdmin){
-        User.findAll()
-        .then(user => res.status(200).json(user))
-        .catch(err => res.status(500).json({ error: err }));
-    }
-    else{
-        res.status(401).json({ error: 'Not Authorized' })
+    try {
+        if(req.user.isAdmin){
+            User.findAll()
+            .then(user => res.status(200).json({
+                data:user,
+                status:200,
+                message:'success'}))
+            .catch(err => res.status(500).json({
+                data:[],
+                status:500,
+                message:err.message
+            }));
+        }
+        else{
+            res.status(401).json({ error: 'Not Authorized' })
+        }
+    } catch(error){
+        console.log(error);
+        res.status(500).json({
+            data:[],
+            status:500,
+            message:'An error occured.'
+        })
     }
     
 })

@@ -6,56 +6,105 @@ const fetch = require("node-fetch");
 
 //create poem
 router.post('/create', validateSession, (req, res) =>{
-    const poetryPage = {
-        title: req.body.title,
-        dateCreated: req.body.dateCreated,
-        category: req.body.category,
-        writeUp: req.body.writeUp,
-        poemWriterComment: req.body.poemWriterComment,
-        isExternal:req.body.isExternal,
-        isPublic: req.body.isPublic,
-        publicationRequested: req.body.publicationRequested,
-        userId: req.user.id
-    };
-    console.log(poetryPage);
-    
-    Poetry.create(poetryPage)
-    .then(poetry => res.status(200).json(poetry))
-    .catch(err => res.status(200).json({ error: err }))
+    try {
+        const poetryPage = {
+            title: req.body.title,
+            dateCreated: req.body.dateCreated,
+            category: req.body.category,
+            writeUp: req.body.writeUp,
+            poemWriterComment: req.body.poemWriterComment,
+            isExternal:req.body.isExternal,
+            isPublic: req.body.isPublic,
+            publicationRequested: req.body.publicationRequested,
+            userId: req.user.id
+        };
+        console.log(poetryPage);
+        
+        Poetry.create(poetryPage)
+        .then(poetry => res.status(200).json({
+            data:poetry,
+            status:200,
+            message:"success"
+        }))
+        .catch(err => res.status(500).json({
+            data:[],
+            status:500,
+            message:err.message
+        }))
+    } catch (error){
+        console.log(error);
+        res.status(500).json({
+            data:[],
+            status:500,
+            message:'An error occured.'
+        })
+    }
 });
 
 //get all poems
 router.get("/", (req,res) => {
-    Poetry.findAll(
-        {
-            include:[
-                { 
-                    model: User, 
-                    attributes: ['email'],
-                    include:[
-                        {
-                            model: Profile,
-                            attributes: ['firstName','lastName']
-                        }
-                    ]
-                }
-            ], 
-        }
-    )
-    .then(poetry => res.status(200).json(poetry))
-    .catch(err => res.status(500).json({ error:err }))
+    try {
+        Poetry.findAll(
+            {
+                include:[
+                    { 
+                        model: User, 
+                        attributes: ['email'],
+                        include:[
+                            {
+                                model: Profile,
+                                attributes: ['firstName','lastName']
+                            }
+                        ]
+                    }
+                ], 
+            }
+        )
+        .then(poetry => res.status(200).json({
+            data:poetry,
+            status:200,
+            message:'success'
+        }))
+        .catch(err => res.status(500).json({
+            data:[],
+            status:500,
+            message:err.message
+        }))
+    } catch {
+        console.log(error);
+        res.status(500).json({
+            data:[],
+            status:500,
+            message:'An error occured.'
+        })
+    }
 });
 
 // get individual poem log by title
 router.get('/mine', validateSession, function(req, res){
-    Poetry.findAll({
-        where: {
-            userId: req.user.id },
-            
-    })
-    .then(poetry => res.status(200).json(poetry))
-    .catch(err => res.status(500).json({ error: err}))
-
+    try {
+        Poetry.findAll({
+            where: {
+                userId: req.user.id },   
+        })
+        .then(poetry => res.status(200).json({
+            data:poetry,
+            status:200, 
+            message: 'success'
+        }))
+        .catch(err => res.status(500).json({
+            data:[],
+            status:500,
+            message: err.message,    
+        }))
+    } catch (error){
+        console.log(error);
+        res.status(500).json({
+            data:[],
+            status:500,
+            message: 'An error occured.'
+        })
+    }
 });
 
 // get a random poem 
@@ -106,94 +155,148 @@ router.get("/poemapi", (req, res) =>{
 
 //get poem by id
 router.get("/:poetryId", (req,res) => {
-    Poetry.findAll({
-        where: {
-            id : req.params.poetryId
-        },
-        include:[
-            {
-                model:PublishRequest,
-                attributes:['isPublicationApproved']
+    try {
+        Poetry.findAll({
+            where: {
+                id : req.params.poetryId
             },
-            { 
-                model: User, 
-                attributes: ['email'],
-                include:[
-                    {
-                        model: Profile,
-                        attributes: ['firstName','lastName']
-                    }
-                ]
-            }, 
-            { 
-                model: Comment 
-            }
-        ]
-    })
-    .then(poetry => res.status(200).json(poetry))
-    .catch(err => res.status(500).json({ error:err }))
+            include:[
+                {
+                    model:PublishRequest,
+                    attributes:['isPublicationApproved']
+                },
+                { 
+                    model: User, 
+                    attributes: ['email'],
+                    include:[
+                        {
+                            model: Profile,
+                            attributes: ['firstName','lastName']
+                        }
+                    ]
+                }, 
+                { 
+                    model: Comment 
+                }
+            ]
+        })
+        .then(poetry => res.status(200).json({
+            data:poetry,
+            status: 200,
+            message:'success'
+        }))
+        .catch(err => res.status(500).json({
+            data:[],
+            status:500,
+            message: err.message
+        }))
+        
+    } catch (error){
+        console.log(error);
+        res.status(500).json({
+            data:[],
+            status:500,
+            message:'An error occured.'
+        })
+    }
 });
 
 
 //update individual's poem
 // testing not successful
 router.put("/:poetryId", validateSession, function (req, res){
-    //get poem
-    Poetry.findOne({ 
-        where: {id: req.params.poetryId}
-    })
-    .then(poem => {
-        console.log(poem);
-        // does poem exist
-        if(!poem){
-            console.log('Poem does not exist!')
-            res.status(404).json({message: "Poem not found!"});
-        }
-
-        //does poem belong to current user
-        else if(poem.userId !== req.user.id){
-            console.log(poem,'I want to see poem');
-            console.log('Poem does not belong to user');
-            res.status(401).json({message: 'You do not have the rights to this poem'});
-        }
-        //poem belongs to current user
-
-        else {
-            const updatePoetry = {
-                title: req.body.title,
-                dateCreated: req.body.dateCreated,
-                author: req.body.author,
-                category: req.body.category,
-                writeUp: req.body.writeUp,
-                poemWriterComment: req.body.poemWriterComment,
-                isExternal:req.body.isExternal,
-                isPublic: req.body.isPublic,
-                ispublicationRequested: req.body.ispublicationRequested
+    try {
+        //get poem
+        Poetry.findOne({ 
+            where: {id: req.params.poetryId}
+        })
+        .then(poem => {
+            console.log(poem);
+            // does poem exist
+            if(!poem){
+                console.log('Poem does not exist!')
+                res.status(404).json({message: "Poem not found!"});
             }
+    
+            //does poem belong to current user
+            else if(poem.userId !== req.user.id){
+                console.log(poem,'I want to see poem');
+                console.log('Poem does not belong to user');
+                res.status(401).json({message: 'You do not have the rights to this poem'});
+            }
+            //poem belongs to current user
+    
+            else {
+                const updatePoetry = {
+                    title: req.body.title,
+                    dateCreated: req.body.dateCreated,
+                    author: req.body.author,
+                    category: req.body.category,
+                    writeUp: req.body.writeUp,
+                    poemWriterComment: req.body.poemWriterComment,
+                    isExternal:req.body.isExternal,
+                    isPublic: req.body.isPublic,
+                    ispublicationRequested: req.body.ispublicationRequested
+                }
+    
+                const query = { where: { id: req.params.poetryId, userId: req.user.id } }
+            
+                Poetry.update(updatePoetry, query)
+                .then((poetry) => res.status(200).json({
+                    data:poetry,
+                    status:200,
+                    message:"success"
+                }))
+                .catch((err) => res.status(500).json({
+                    data:[],
+                    status:500,
+                    message:err.message
+                }));
+            }
+        })
+        .catch(error =>{
+            console.log(error);
+            res.status(500).json({
+                data:[],
+                status: 500,
+                message: "An error occured. Please try again later"});
+        });
 
-            const query = { where: { id: req.params.poetryId, userId: req.user.id } }
-        
-            Poetry.update(updatePoetry, query)
-            .then((poetry) => res.status(200).json(poetry))
-            .catch((err) => res.status(500).json({error:err}));
-        }
-    })
-    .catch(error =>{
+    } catch(error){
         console.log(error);
-        res.status(500).json({message: "Error occured. Try again later"});
-    });
+        res.status(500).json({
+            data:[],
+            status:500,
+            message:'An error occured.'
+        })
+    }
 
     
 });
 
 //delete individual's poem
 router.delete("/:poetryId", validateSession, function (req, res){
-    const query = {
-        where: { id: req.params.poetryId, userId: req.user.id }
-    };
-    Poetry.destroy(query)
-    .then(() => res.status(200).json({ message: "Poem entry removed"}))
-    .catch((err) => res.status(500).json({ error: err }));
+    try {
+        const query = {
+            where: { id: req.params.poetryId, userId: req.user.id }
+        };
+        Poetry.destroy(query)
+        .then(() => res.status(200).json({ 
+            status:200,
+            message: "Poem entry removed"}))
+        .catch((err) => res.status(500).json({
+            data:[],
+            status:500,
+            message: err.message
+        }));
+    } catch (error){
+        console.log(error);
+        res.status(500).json({
+            data:[],
+            status:500,
+            message:'An error occured.'
+        })
+    }
 });
 
 module.exports = router;
