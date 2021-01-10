@@ -9,13 +9,9 @@ router.post('/create', validateSession, (req, res) =>{
     try {
         const poetryPage = {
             title: req.body.title,
-            dateCreated: req.body.dateCreated,
             category: req.body.category,
             writeUp: req.body.writeUp,
             poemWriterComment: req.body.poemWriterComment,
-            isExternal:req.body.isExternal,
-            isPublic: req.body.isPublic,
-            publicationRequested: req.body.publicationRequested,
             userId: req.user.id
         };
         console.log(poetryPage);
@@ -33,7 +29,9 @@ router.post('/create', validateSession, (req, res) =>{
         }))
     } catch (error){
         console.log(error);
-        res.status(500).json({
+        res
+        .status(500)
+        .json({
             data:[],
             status:500,
             message:'An error occured.'
@@ -85,7 +83,20 @@ router.get('/mine', validateSession, function(req, res){
     try {
         Poetry.findAll({
             where: {
-                userId: req.user.id },   
+                userId: req.user.id 
+            },  
+            include:[
+                { 
+                    model: User, 
+                    attributes: ['email'],
+                    include:[
+                        {
+                            model: Profile,
+                            attributes: ['firstName','lastName']
+                        }
+                    ]
+                }
+            ],  
         })
         .then(poetry => res.status(200).json({
             data:poetry,
@@ -176,7 +187,13 @@ router.get("/:poetryId", (req,res) => {
                     ]
                 }, 
                 { 
-                    model: Comment 
+                    model: Comment,
+                    include:[
+                        {
+                            model: Profile,
+                            attributes: ['firstName','lastName']
+                        }
+                    ]
                 }
             ]
         })
@@ -215,14 +232,20 @@ router.put("/:poetryId", validateSession, function (req, res){
             // does poem exist
             if(!poem){
                 console.log('Poem does not exist!')
-                res.status(404).json({message: "Poem not found!"});
+                res.status(404).json({
+                    data: {},
+                    status:404,
+                    message: "Poem not found!"});
             }
     
             //does poem belong to current user
             else if(poem.userId !== req.user.id){
                 console.log(poem,'I want to see poem');
                 console.log('Poem does not belong to user');
-                res.status(401).json({message: 'You do not have the rights to this poem'});
+                res.status(401).json({
+                    data: poem,
+                    status: 401,
+                    message: 'You do not have the rights to this poem'});
             }
             //poem belongs to current user
     
@@ -248,7 +271,7 @@ router.put("/:poetryId", validateSession, function (req, res){
                     message:"success"
                 }))
                 .catch((err) => res.status(500).json({
-                    data:[],
+                    data:{},
                     status:500,
                     message:err.message
                 }));
@@ -257,7 +280,7 @@ router.put("/:poetryId", validateSession, function (req, res){
         .catch(error =>{
             console.log(error);
             res.status(500).json({
-                data:[],
+                data:{},
                 status: 500,
                 message: "An error occured. Please try again later"});
         });
@@ -265,7 +288,7 @@ router.put("/:poetryId", validateSession, function (req, res){
     } catch(error){
         console.log(error);
         res.status(500).json({
-            data:[],
+            data:{},
             status:500,
             message:'An error occured.'
         })
@@ -285,14 +308,14 @@ router.delete("/:poetryId", validateSession, function (req, res){
             status:200,
             message: "Poem entry removed"}))
         .catch((err) => res.status(500).json({
-            data:[],
+            data:{},
             status:500,
             message: err.message
         }));
     } catch (error){
         console.log(error);
         res.status(500).json({
-            data:[],
+            data:{},
             status:500,
             message:'An error occured.'
         })

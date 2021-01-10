@@ -1,185 +1,253 @@
 const router = require('express').Router();
 var Sequelize = require('sequelize');
-const Op=Sequelize.Op;
-const validateSession = require("../middleware/validateSession");
-const {Profile} = require("../db");
+const Op = Sequelize.Op;
+const validateSession = require('../middleware/validateSession');
+const { Profile, User } = require('../db');
+const cloudinary = require('cloudinary');
+
+//get image
+router.get('/cloudsign', validateSession, async (req, res) => {
+  try {
+    const ts = Math.floor(new Date().getTime() / 1000).toString();
+
+    const sig = cloudinary.utils.api_sign_request(
+      {
+        timestamp: ts,
+        upload_preset: 'openMic',
+      },
+      process.env.CLOUDINARY_SECRET
+    );
+    res.status(200).json({
+      sig,
+      ts,
+    });
+  } catch (err) {
+      console.log('failed to sign',err);
+
+    res.status(500).json({
+      data: {},
+      status: 500,
+      message: 'failed to sign',
+    });
+  }
+});
+
+//update image
+router.put('/imageset', validateSession, async (req, res) => {
+  try {
+    const userProfile = await Profile.findOne({ where: { userId: req.user.id } });
+    const result = await userProfile.update({
+      picUrl: req.body.url,
+    });
+    res.status(200).json({
+      result,
+      status: 200,
+      message: 'avatar url saved',
+    });
+  } catch (err) {
+    res.status(500).json({
+      data: '',
+      status: 500,
+      message: 'failed to set image',
+    });
+  }
+});
 
 //create user profile
-router.post('/create', validateSession, (req, res) =>{
-    try {
-        const existingProfile = Profile.findOne({"userId": req.user.id});
-        if (existingProfile){
-            res.status(400).json({error: 'Profile already exists.'})
-        } else {
-            const profilePage = {
-                picUrl: req.body.picUrl,
-                req: req.body.picUrl,
-                about: req.body.about,
-                hobbies: req.body.hobbies,
-                poemWriterSince: req.body.poemWriterSince,
-                funFact: req.body.funFact,
-                dreamJob: req.body.dreamJob,
-                resumeUpload: req.body.resumeUpload
-            };
-            Profile.create(profilePage)
-            .then((profile)=> res.status(200).json({
-                data:profile,
-                status:200,
-                message: "success"
-            }))
-            .catch(() => res.status(500).json({
-                data:[],
-                status:500,
-                message:err.message,
-            }));
-        }
-    } catch (error){
-        // exception handling
-        console.log(error);
-        res.status(500).json({
-            data:[],
-            status:500,
-            message: "An error occured"
-        });
+router.post('/', validateSession, (req, res) => {
+  try {
+    const existingProfile = Profile.findOne({ userId: req.user.id });
+    if (existingProfile) {
+      res.status(400).json({ error: 'Profile already exists.' });
+    } else {
+      const profilePage = {
+        picUrl: req.body.picUrl,
+        about: req.body.about,
+        hobbies: req.body.hobbies,
+        poemWriterSince: req.body.poemWriterSince,
+        funFact: req.body.funFact,
+        dreamJob: req.body.dreamJob,
+        resumeUpload: req.body.resumeUpload,
+      };
+      Profile.create(profilePage)
+        .then((profile) =>
+          res.status(200).json({
+            data: profile,
+            status: 200,
+            message: 'success',
+          })
+        )
+        .catch(() =>
+          res.status(500).json({
+            data: {},
+            status: 500,
+            message: err.message,
+          })
+        );
     }
+  } catch (error) {
+    // exception handling
+    console.log(error);
+    res.status(500).json({
+      data: {},
+      status: 500,
+      message: 'An error occured',
+    });
+  }
 });
 
 //Get '/' get individual profile by id
-router.get('/mine', validateSession, (req, res) =>{
-    try {
-        let userid = req.user.id;
-        Profile.findOne({
-            where: { userId: userid }
+router.get('/mine', validateSession, (req, res) => {
+  try {
+    let userid = req.user.id;
+    Profile.findOne({
+      where: { userId: userid },
+    })
+      .then((profile) =>
+        res.status(200).json({
+          data: profile,
+          status: 200,
+          message: 'success',
         })
-        .then(profile => res.status(200).json({
-            data:profile,
-            message:'success',
-            status:200
-        }))
-        .catch(err => res.status(500).json({    
-                data:[],
-                message:err.message,
-                status:500 
-        }))
-    } catch (error){
-         // exception handling
-         console.log(error);
-         res.status(500).json({
-             data:[],
-             status:500,
-             message: "An error occured"
-         });
-    }
+      )
+      .catch((err) =>
+        res.status(500).json({
+          data: {},
+          message: err.message,
+          status: 500,
+        })
+      );
+  } catch (error) {
+    // exception handling
+    console.log(error);
+    res.status(500).json({
+      data: {},
+      message: 'An error occured',
+      status: 500,
+    });
+  }
 });
 
 //get all profiles
-router.get('/all', validateSession, (req, res) =>{
-    try {
-        if(req.user.isAdmin){
-            Profile.findAll()
-            .then(profiles => res.status(200).json({
-                data:profiles,
-                message:'success',
-                status:200
-            })
-            )
-            .catch(err => res.status(500).json({     
-                data:[],
-                message:err.message,
-                status:500 }))
-        } else {
-            console.log("User is not an admin");
-            res.status(401).json({
-                data:[],
-                status:500,
-                message: "Not authorized"
-            });
-        }
-    } catch (error) {
-        // exception handling
-        console.log(error);
-        res.status(500).json({
-            data:[],
-            status:500,
-            message: "An error occured"
-        });
+router.get('/all', validateSession, (req, res) => {
+  try {
+    if (req.user.isAdmin) {
+      Profile.findAll()
+        .then((profiles) =>
+          res.status(200).json({
+            data: profiles,
+            message: 'success',
+            status: 200,
+          })
+        )
+        .catch((err) =>
+          res.status(500).json({
+            data: [],
+            message: err.message,
+            status: 500,
+          })
+        );
+    } else {
+      console.log('User is not an admin');
+      res.status(401).json({
+        data: [],
+        status: 500,
+        message: 'Not authorized',
+      });
     }
+  } catch (error) {
+    // exception handling
+    console.log(error);
+    res.status(500).json({
+      data: [],
+      status: 500,
+      message: 'An error occured',
+    });
+  }
 });
 
 //get individual profile for update
-router.put('/update', validateSession, (req, res) =>{
-    try{
-        const existingProfile = Profile.findOne({ 
-            where: { userId: req.user.id }
-        });
-        if (existingProfile){
-            const updateProfile = {
-                firstName: req.body.firstName,
-                lastName: req.body.lastName,
-                email: req.body.email,
-                req: req.body.picUrl,
-                about: req.body.about,
-                hobbies: req.body.hobbies,
-                poemWriterSince: req.body.poemWriterSince,
-                funFact: req.body.funFact,
-                dreamJob: req.body.dreamJob,
-                resumeUpload: req.body.resumeUpload
-            };
-            const query = { 
-                where: {
-                    userId: req.user.id
-                }
-            }
-            Profile.update(updateProfile, query)
-            .then((profile) => res.status(200).json({
-                data:profile,
-                status: 200,
-                message:'success'
-            })
-            )
-            .catch((err) => res.status(500).json({
-                data:[],
-                message:err.message,
-                status:500
-            })); 
-        }
-        else {
-            //respond with error saying profile already exists
-            res.status(404).json({ message: "Profile not found." })
-        }
-    } catch (error){
-        console.log(error);
-        res.status(500).json({
-            data:[],
-            status:500,
-            message: 'An error occured.'
-        })
+router.put('/', validateSession, (req, res) => {
+  try {
+    const existingProfile = Profile.findOne({
+      where: { userId: req.user.id },
+    });
+    if (existingProfile) {
+      const updateProfile = {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        //picUrl: req.body.picUrl,
+        about: req.body.about,
+        hobbies: req.body.hobbies,
+        poemWriterSince: req.body.poemWriterSince === ''? null : req.body.poemWriterSince,
+        funFact: req.body.funFact,
+        dreamJob: req.body.dreamJob,
+        resumeUpload: req.body.resumeUpload,
+      };
+      const query = {
+        where: {
+          userId: req.user.id,
+        },
+      };
+      Profile.update(updateProfile, query)
+        .then((profile) =>
+          res.status(200).json({
+            data: profile,
+            status: 200,
+            message: 'success',
+          })
+        )
+        .catch((err) =>
+          res.status(500).json({
+            data: [],
+            message: err.message,
+            status: 500,
+          })
+        );
+    } else {
+      //respond with error saying profile already exists
+      res.status(404).json({
+        data: [],
+        message: 'Profile not found.',
+        status: 404,
+      });
     }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      data: [],
+      status: 500,
+      message: 'An error occured.',
+    });
+  }
 });
 
 //allow individual profiles to be deleted
-router.delete('/delete', validateSession, (req, res) =>{
-    try{
-        const query = {
-            where: {
-                userId: req.user.id
-            }
-        }
-        Profile.destroy(query)
-        .then(() => res.status(200).json({ message: 'Profile entry removed'}))
-        .catch((err) => res.status(200).json({
-            data:[],
-            message:err.message,
-            status:500
-        }));
-    } catch (error){
-        console.log(error);
-        res.status(500).json({
-            data:[],
-            staus:500,
-            message:'An error occured'
+router.delete('/delete', validateSession, (req, res) => {
+  try {
+    const query = {
+      where: {
+        userId: req.user.id,
+      },
+    };
+    Profile.destroy(query)
+      .then(() => res.status(200).json({ message: 'Profile entry removed' }))
+      .catch((err) =>
+        res.status(200).json({
+          data: [],
+          status: 500,
+          message: err.message,
         })
-    }
+      );
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      data: [],
+      staus: 500,
+      message: 'An error occured',
+    });
+  }
 });
 
 // permit admin to delete profile
