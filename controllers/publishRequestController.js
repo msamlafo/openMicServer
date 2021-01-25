@@ -3,7 +3,7 @@ const {PublishRequest, Poetry, User} = require("../db");
 const router = require('express').Router();
 
 //create request
-router.post('/create', validateSession, (req, res) =>{
+router.post('/', validateSession, (req, res) =>{
     try {
         //get poem
         Poetry.findOne({ 

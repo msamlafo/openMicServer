@@ -8,7 +8,7 @@ const database = new Sequelize(process.env.NAME, 'postgres', process.env.PASS, {
 
 //authenticate that the username and password match, then log into database
 database.authenticate()
-.then(()=> console.log('postgress db is connected!'))
+.then(()=> console.log('postgres db is connected!'))
 .catch(err=> console.log(err));
 
 const User = database.import('./models/user');
@@ -16,6 +16,8 @@ const Profile = database.import('./models/profile');
 const Poetry = database.import('./models/poetry');
 const Comment = database.import('./models/comment');
 const PublishRequest = database.import('./models/publishrequest');
+const IssueFlagging = database.import('./models/issueFlagging');
+const Like = database.import('./models/like');
 const Reply = database.import('./models/reply');
 
 User.hasOne(Profile);
@@ -42,4 +44,16 @@ Reply.belongsTo(Comment);
 User.hasMany(Reply);
 Reply.belongsTo(User);
 
-module.exports = {database,User,Comment,Profile,PublishRequest,Reply,Poetry};
+User.hasMany(IssueFlagging);
+IssueFlagging.belongsTo(User);
+
+Poetry.hasMany(IssueFlagging);
+IssueFlagging.belongsTo(Poetry);
+
+User.hasMany(Like);
+Like.belongsTo(User);
+
+Poetry.hasMany(Like);
+Like.belongsTo(Poetry);
+
+module.exports = {database, User, Comment, Profile,PublishRequest, Reply, Poetry, IssueFlagging, Like};

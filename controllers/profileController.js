@@ -18,12 +18,12 @@ router.get('/cloudsign', validateSession, async (req, res) => {
       process.env.CLOUDINARY_SECRET
     );
     res.status(200).json({
-      sig,
-      ts,
+      data: { sig, ts },
+      status: 200,
+      message: 'Signature obtained successfully!',
     });
   } catch (err) {
-      console.log('failed to sign',err);
-
+    console.log('failed to sign', err);
     res.status(500).json({
       data: {},
       status: 500,
@@ -35,12 +35,14 @@ router.get('/cloudsign', validateSession, async (req, res) => {
 //update image
 router.put('/imageset', validateSession, async (req, res) => {
   try {
-    const userProfile = await Profile.findOne({ where: { userId: req.user.id } });
+    const userProfile = await Profile.findOne({
+      where: { userId: req.user.id },
+    });
     const result = await userProfile.update({
       picUrl: req.body.url,
     });
     res.status(200).json({
-      result,
+      data: result,
       status: 200,
       message: 'avatar url saved',
     });
@@ -52,6 +54,31 @@ router.put('/imageset', validateSession, async (req, res) => {
     });
   }
 });
+
+//update resumeUpload
+router.put('/resumeset', validateSession, async (req, res) => {
+    try {
+      const userProfile = await Profile.findOne({
+        where: { userId: req.user.id },
+      });
+      const result = await userProfile.update({
+        resumeUpload: req.body.resumeUpload,
+      });
+      res.status(200).json({
+        data: result,
+        status: 200,
+        message: 'Resume url saved',
+      });
+    } catch (err) {
+      res.status(500).json({
+        data: '',
+        status: 500,
+        message: 'failed to set resume',
+      });
+    }
+  });
+
+
 
 //create user profile
 router.post('/', validateSession, (req, res) => {
@@ -151,7 +178,7 @@ router.get('/all', validateSession, (req, res) => {
       console.log('User is not an admin');
       res.status(401).json({
         data: [],
-        status: 500,
+        status: 401,
         message: 'Not authorized',
       });
     }
@@ -169,6 +196,7 @@ router.get('/all', validateSession, (req, res) => {
 //get individual profile for update
 router.put('/', validateSession, (req, res) => {
   try {
+    console.log('rrerercaacae', req.body);
     const existingProfile = Profile.findOne({
       where: { userId: req.user.id },
     });
@@ -177,13 +205,11 @@ router.put('/', validateSession, (req, res) => {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
-        //picUrl: req.body.picUrl,
         about: req.body.about,
         hobbies: req.body.hobbies,
-        poemWriterSince: req.body.poemWriterSince === ''? null : req.body.poemWriterSince,
+        poemWriterSince: req.body.poemWriterSince || null,
         funFact: req.body.funFact,
         dreamJob: req.body.dreamJob,
-        resumeUpload: req.body.resumeUpload,
       };
       const query = {
         where: {
@@ -207,6 +233,7 @@ router.put('/', validateSession, (req, res) => {
         );
     } else {
       //respond with error saying profile already exists
+      console.log('oooooooooo - not found?', req.body);
       res.status(404).json({
         data: [],
         message: 'Profile not found.',

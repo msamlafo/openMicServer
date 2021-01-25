@@ -4,7 +4,7 @@ const router = require('express').Router();
 
 //create comment
 //poemId and userId not working
-router.post('/create', validateSession, (req, res) =>{
+router.post('/', validateSession, (req, res) =>{
     try {
         const commentLine = {
             comment: req.body.comment,
@@ -15,9 +15,9 @@ router.post('/create', validateSession, (req, res) =>{
         .then(comment => res.status(200).json({
             data:comment,
             status:200,
-            message:'Sucess'
+            message:'Success'
         }))
-        .catch(err => res.status(200).json({
+        .catch(err => res.status(500).json({
             data:[],
             status:500,
             message: err.message
@@ -91,8 +91,6 @@ router.put("/:id", validateSession, function (req, res){
     try {
         const updateComment = {
             comment: req.body.comment,
-            poetryId: req.body.poetryId, 
-            userId: req.body.userId
         }
         const query = { where: { id: req.params.id, userId: req.user.id } }
     
@@ -103,40 +101,39 @@ router.put("/:id", validateSession, function (req, res){
             message:'Sucess'
         }))
         .catch((err) => res.status(500).json({
-            data:[],
+            data:{},
             status:500,
             message: err.message
         }));
     } catch(error){
         console.log(error);
         res.status(500).json({
-            data:[],
+            data:{},
             status:500, 
             message:'An error occured.'
         })
     }
 });
 
-//delete individual's conment
-//Testing not successful
+//delete issure by id
 router.delete("/:id", validateSession, function (req, res){
     try{
         const query = {
-            where: { id: req.params.id, userId: req.user.id }
+            where: { id: req.params.commentId, userId: req.user.id }
         };
         Comment.destroy(query)
         .then(() => res.status(200).json({  
             status:200,
             message: "Comment entry removed"}))
         .catch((err) => res.status(500).json({
-            data:[],
+            data:{},
             status:500,
             message: err.message
         }));
     } catch(error){
         console.log(error);
-        res.status(200).json({
-            data:[],
+        res.status(500).json({
+            data:{},
             status:500, 
             message:'An error occured.'
         })

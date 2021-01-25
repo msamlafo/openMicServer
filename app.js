@@ -20,6 +20,8 @@ app.use('/profile', controllers.ProfileController);
 app.use('/poetry', controllers.PoetryController);
 app.use('/comment', controllers.CommentController);
 app.use('/publish', controllers.PublishRequestController);
+app.use('/issueFlagging', controllers.IssueFlaggingController);
+app.use('/like', controllers.LikeController);
 
 
 

@@ -4,7 +4,8 @@ module.exports=(sequelize, DataTypes) =>{
             type: DataTypes.STRING
         },
         dateCreated :{
-            type: DataTypes.DATE
+            type: DataTypes.DATE,
+            defaultValue:DataTypes.NOW
         },
         category: {
             type: DataTypes.STRING
