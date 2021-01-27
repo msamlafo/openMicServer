@@ -119,7 +119,7 @@ router.put("/:id", validateSession, function (req, res){
 router.delete("/:id", validateSession, function (req, res){
     try{
         const query = {
-            where: { id: req.params.commentId, userId: req.user.id }
+            where: { id: req.params.id, userId: req.user.id }
         };
         Comment.destroy(query)
         .then(() => res.status(200).json({  

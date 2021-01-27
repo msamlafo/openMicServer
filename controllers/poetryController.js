@@ -199,7 +199,7 @@ router.get('/:poetryId', (req, res) => {
           include: [
             {
               model: User,
-              attributes: ['email'],
+              attributes: ['email','id'],
               include: [
                 {
                   model: Profile,
