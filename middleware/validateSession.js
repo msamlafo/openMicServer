@@ -23,6 +23,7 @@ const validateSession = (req, res, next) => {
           .catch((err) => next(err));
       } else {
         req.errors = err;
+        console.log(err);
         return res.status(500).send('Not Authorized');
       }
     });
