@@ -62,7 +62,7 @@ router.put('/resumeset', validateSession, async (req, res) => {
         where: { userId: req.user.id },
       });
       const result = await userProfile.update({
-        resumeUpload: req.body.resumeUpload,
+        resumeUpload: req.body.url,
       });
       res.status(200).json({
         data: result,

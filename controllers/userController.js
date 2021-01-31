@@ -36,7 +36,7 @@ router.post('/signup', (req, res) => {
         });
         res.status(200).json({
           data: { 
-            user: user, 
+            user, 
             sessionToken: token 
         },
         status: 200,
@@ -76,7 +76,7 @@ router.post('/login', (req, res) => {
               });
               res.status(200).json({
                 data: {
-                  user: user,
+                  user,
                   sessionToken: token,
                 },
                 status: 200,
