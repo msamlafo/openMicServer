@@ -15,7 +15,7 @@ const Profile = database.import('./models/profile');
 const Poetry = database.import('./models/poetry');
 const Comment = database.import('./models/comment');
 const PublishRequest = database.import('./models/publishrequest');
-const IssueFlagging = database.import('./models/issueFlagging');
+const IssueFlagging = database.import('./models/issueflagging');
 const Like = database.import('./models/like');
 const Reply = database.import('./models/reply');
 

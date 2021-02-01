@@ -1,10 +1,10 @@
 const Comment  = require('./comment');
 const Poetry  = require('./poetry');
 const User  = require('./user');
-const PublishRequest  = require('./publishRequest');
+const PublishRequest  = require('./publishrequest');
 const Profile  = require('./profile');
 const Reply = require('./reply');
-const IssueFlagging = require('./issueFlagging');
+const IssueFlagging = require('./issueflagging');
 const Like = require('./like');
 
 module.exports = {
