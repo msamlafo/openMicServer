@@ -11,7 +11,7 @@ const app = Express();
 
 database.sync();
 // database.sync({force:true});
-app.use(require('./middleware/headers'));
+//app.use(require('./middleware/headers'));
 
 app.use(Express.json());  //brings in JSON parser for backend
 
