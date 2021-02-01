@@ -14,8 +14,8 @@ const User = database.import('./models/user');
 const Profile = database.import('./models/profile');
 const Poetry = database.import('./models/poetry');
 const Comment = database.import('./models/comment');
-//const PublishRequest = database.import('./models/publishrequest');
-const IssueFlagging = database.import('./models/issueflagging');
+const Publishing = database.import('./models/publishing');
+const IssueFlagging = database.import('./models/issue');
 const Like = database.import('./models/like');
 const Reply = database.import('./models/reply');
 
@@ -31,11 +31,11 @@ Comment.belongsTo(Poetry);
 User.hasMany(Comment);
 Comment.belongsTo(User);
 
-// User.hasMany(PublishRequest)
-// PublishRequest.belongsTo(User);
+User.hasMany(Publishing)
+Publishing.belongsTo(User);
 
-// Poetry.hasMany(PublishRequest);
-// PublishRequest.belongsTo(Poetry);
+Poetry.hasMany(Publishing);
+Publishing.belongsTo(Poetry);
 
 Comment.hasMany(Reply);
 Reply.belongsTo(Comment);
@@ -55,4 +55,4 @@ Like.belongsTo(User);
 Poetry.hasMany(Like);
 Like.belongsTo(Poetry);
 
-module.exports = {database, User, Comment, Profile, Reply, Poetry, IssueFlagging, Like};
+module.exports = {database, User, Comment, Profile,Publishing, Reply, Poetry, IssueFlagging, Like};
