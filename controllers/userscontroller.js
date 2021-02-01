@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { User, Profile } = require('../db');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const validateSession = require('../middleware/validatesession');
+const validateSession = require('../middleware/validatesessions');
 
 //POST: '/signup' creates a account
 router.post('/signup', (req, res) => {

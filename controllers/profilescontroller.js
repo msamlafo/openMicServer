@@ -1,7 +1,7 @@
 const router = require('express').Router();
 var Sequelize = require('sequelize');
 const Op = Sequelize.Op;
-const validateSession = require('../middleware/validatesession');
+const validateSession = require('../middleware/validatesessions');
 const { Profile, User } = require('../db');
 const cloudinary = require('cloudinary');
 
