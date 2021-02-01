@@ -1,4 +1,4 @@
-const validateSession = require("../middleware/validateSession");
+const validateSession = require("../middleware/validatesession");
 const {PublishRequest, Poetry, User} = require("../db");
 const router = require('express').Router();
 

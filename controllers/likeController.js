@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const validateSession = require('../middleware/validateSession');
+const validateSession = require('../middleware/validatesession');
 const { Like } = require('../db');
 
 // get /poetry /:poetryId all likes for a single poem

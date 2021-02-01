@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const validateSession = require('../middleware/validateSession');
+const validateSession = require('../middleware/validatesession');
 const { IssueFlagging, User, Profile, Poetry } = require('../db');
 
 //create issue
