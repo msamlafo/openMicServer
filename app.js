@@ -4,14 +4,9 @@ const {database} = require('./db');
 const controllers = require('./controllers');
 const app = Express();
 
-// app.use(Express.static(__dirname + '/public'));
-// app.get('/', (req, res)=>{
-//     res.render('index');
-// })
-
 database.sync();
 // database.sync({force:true});
-//app.use(require('./middleware/headers'));
+app.use(require('./middleware/headers'));
 
 app.use(Express.json());  //brings in JSON parser for backend
 
