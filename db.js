@@ -2,9 +2,8 @@ const Sequelize = require('sequelize');
 
 //create a new instance of sequelize, connecting us to the database
 const database = new Sequelize(process.env.DATABASE_URL, {
-    dialect: 'postgres',ssl: {
-        rejectUnauthorized: false
-      }
+    dialect: 'postgres',
+    dialectOptions: {}
 });
 
 //authenticate that the username and password match, then log into database
