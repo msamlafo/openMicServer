@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) =>{
-    const PublishRequestProcessing = sequelize.define('publishRequest', {
+    const PublishRequestProcessing = sequelize.define('publishrequest', {
         requestDate: {
             type:DataTypes.DATE,
             allowNull:false,
