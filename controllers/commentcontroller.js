@@ -1,4 +1,4 @@
-const validateSession = require("../middleware/validatesessions");
+const validateSession = require("../middleware/validatesession");
 const {Comment} = require("../db");
 const router = require('express').Router();
 

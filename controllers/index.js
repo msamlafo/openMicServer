@@ -1,10 +1,10 @@
-const CommentController = require('./commentscontroller');
-const UserController = require('./userscontroller');
-const ProfileController  = require('./profilescontroller');
-const PoetryController = require('./poetryscontroller');
+const CommentController = require('./commentcontroller');
+const UserController = require('./usercontroller');
+const ProfileController  = require('./profilecontroller');
+const PoetryController = require('./poetrycontroller');
 const PublishingController = require('./publishingcontroller');
-const IssueFlaggingController = require('./issuescontroller');
-const LikeController = require('./likescontroller');
+const IssueFlaggingController = require('./issuecontroller');
+const LikeController = require('./likecontroller');
 
 module.exports = {
     CommentController,
