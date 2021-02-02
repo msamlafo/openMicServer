@@ -2,8 +2,8 @@
 
 ##### by MANSA SAMLAFO 
 
-![Image](../asset/openmic-logo-sm.png "icon")
-<img src="../asset/openmic-logo-sm.png" alt="openmic-logo" />  
+![Image](./asset/openmic-logo-sm.png "icon")
+<img src="./asset/openmic-logo-sm.png" alt="openmic-logo" />  
 
 ## Table of Contents
 - [About openMic](#About_openMic)
