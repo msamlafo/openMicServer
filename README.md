@@ -2,7 +2,7 @@
 
 ##### by MANSA SAMLAFO 
 
-![Image](./src/Assets/openmic.png "icon")  
+![Image](.assets/openmic-logo-sm.png "icon")  
 
 ## Table of Contents
 - [About openMic](#About_openMic)
@@ -42,6 +42,6 @@ To run the application on your computer follow the below instructions:
 
 * Click [openMic Tello board](https://trello.com/b/SnWtS2Li/openmic)
 
-                                ``` 
-                                ```<Elevenfifty Academy © MDS 2021>```
-                                ``` 
+                                 
+                                <Elevenfifty Academy © MDS 2021>
+                                 

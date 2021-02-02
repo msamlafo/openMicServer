@@ -36,7 +36,7 @@ router.post('/', validateSession, (req, res) => {
         } else {
           // publication is not requested for this poem
           // if no pending request exists for this poem, then create one
-          PublishRequest.findOne({ where: { poetryId: poem.id } })
+          Publishing.findOne({ where: { poetryId: poem.id } })
             .then((foundRequest) => {
               // To Do
               // update poetry.isPublicationRequested = true
@@ -49,7 +49,7 @@ router.post('/', validateSession, (req, res) => {
                   poetryId: req.body.poetryId,
                 };
 
-                PublishRequest.create(requestPublication)
+                Publishing.create(requestPublication)
                   .then((request) => {
                     //if request creation is successful, update isPublicationRequested to true
                     updateIsPublicationRequested(poem, res, request);

@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const validateSession = require('../middleware/validatesession');
-const { Poetry, User, Profile, Comment, PublishRequest,Like } = require('../db');
+const { Poetry, User, Profile, Comment, Publishing,Like } = require('../db');
 
 //create poem
 router.post('/', validateSession, (req, res) => {
@@ -181,7 +181,7 @@ router.get('/:poetryId', (req, res) => {
       },
       include: [
         {
-          model: PublishRequest,
+          model: Publishing,
           attributes: ['isPublicationApproved'],
         },
         {
