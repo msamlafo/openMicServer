@@ -2,7 +2,7 @@
 
 ##### by MANSA SAMLAFO 
 
-![Image](.assets/openmic-logo-sm.png "icon")  
+![Image](.asset/openmic-logo-sm.png "icon")  
 
 ## Table of Contents
 - [About openMic](#About_openMic)
